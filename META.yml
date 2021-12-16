@@ -23,8 +23,7 @@ no_index:
     - t
     - xt
 requires:
-  Class::Utils: 0.02
-  Error::Pure: 0.07
+  Tags::HTML: 0.02
   Unicode::UTF8: 0
   perl: 5.8.0
 resources:

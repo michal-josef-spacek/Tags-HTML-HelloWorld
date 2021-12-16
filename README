@@ -30,6 +30,12 @@ ERRORS
      new():
              From Class::Utils::set_params():
                      Unknown parameter '%s'.
+             From Tags::HTML::new():
+                     Parameter 'tags' must be a 'Tags::Output::*' class.
+
+     process():
+             From Tags::HTML::process():
+                     Parameter 'tags' isn't defined.
 
 EXAMPLE1
      use strict;
@@ -96,8 +102,7 @@ EXAMPLE2
      # </html>
 
 DEPENDENCIES
-    Class::Utils, Error::Pure, Tags::HTML::Page::Begin,
-    Tags::HTML::Page::End, Unicode::UTF8.
+    Tags::HTML::Page::Begin, Tags::HTML::Page::End, Unicode::UTF8.
 
 REPOSITORY
     <https://github.com/michal-josef-spacek/Tags-HTML-HelloWorld>

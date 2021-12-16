@@ -1,10 +1,9 @@
 package Tags::HTML::HelloWorld;
 
+use base qw(Tags::HTML);
 use strict;
 use warnings;
 
-use Class::Utils qw(set_params);
-use Error::Pure qw(err);
 use Tags::HTML::Page::Begin;
 use Tags::HTML::Page::End;
 use Unicode::UTF8 qw(decode_utf8);
@@ -15,26 +14,17 @@ our $VERSION = 0.01;
 sub new {
 	my ($class, @params) = @_;
 
-	# Create object.
-	my $self = bless {}, $class;
+	# No CSS support.
+	push @params, 'no_css', 1;
 
-	# 'Tags::Output' object.
-	$self->{'tags'} = undef;
-
-	# Process params.
-	set_params($self, @params);
-
-	# Check to 'Tags' object.
-	if (! $self->{'tags'} || ! $self->{'tags'}->isa('Tags::Output')) {
-		err "Parameter 'tags' must be a 'Tags::Output::*' class.";
-	}
+	my $self = $class->SUPER::new(@params);
 
 	# Object.
 	return $self;
 }
 
 # Process 'Tags'.
-sub process {
+sub _process {
 	my $self = shift;
 
 	my $begin = Tags::HTML::Page::Begin->new(
@@ -110,6 +100,12 @@ Returns undef.
  new():
          From Class::Utils::set_params():
                  Unknown parameter '%s'.
+         From Tags::HTML::new():
+                 Parameter 'tags' must be a 'Tags::Output::*' class.
+
+ process():
+         From Tags::HTML::process():
+                 Parameter 'tags' isn't defined.
 
 =head1 EXAMPLE1
 
@@ -179,10 +175,9 @@ Returns undef.
 
 =head1 DEPENDENCIES
 
-L<Class::Utils>,
-L<Error::Pure>,
 L<Tags::HTML::Page::Begin>,
-L<Tags::HTML::Page::End>.
+L<Tags::HTML::Page::End>,
+L<Unicode::UTF8>.
 
 =head1 REPOSITORY
 
