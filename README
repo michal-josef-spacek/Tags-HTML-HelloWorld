@@ -97,7 +97,7 @@ EXAMPLE2
 
 DEPENDENCIES
     Class::Utils, Error::Pure, Tags::HTML::Page::Begin,
-    Tags::HTML::Page::End.
+    Tags::HTML::Page::End, Unicode::UTF8.
 
 REPOSITORY
     <https://github.com/michal-josef-spacek/Tags-HTML-HelloWorld>

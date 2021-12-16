@@ -7,6 +7,7 @@ use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use Tags::HTML::Page::Begin;
 use Tags::HTML::Page::End;
+use Unicode::UTF8 qw(decode_utf8);
 
 our $VERSION = 0.01;
 
@@ -37,7 +38,7 @@ sub process {
 	my $self = shift;
 
 	my $begin = Tags::HTML::Page::Begin->new(
-		'author' => 'Michal Josef Špaček',
+		'author' => decode_utf8('Michal Josef Špaček'),
 		'lang' => {
 			'title' => 'Hello world!',
 		},
