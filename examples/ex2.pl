@@ -3,38 +3,69 @@
 use strict;
 use warnings;
 
+use CSS::Struct::Output::Indent;
 use Tags::HTML::HelloWorld;
+use Tags::HTML::Page::Begin;
+use Tags::HTML::Page::End;
 use Tags::Output::Indent;
+use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 
-# Object.
-my $tags = Tags::Output::Indent->new;
-my $obj = Tags::HTML::HelloWorld->new(
+my $css = CSS::Struct::Output::Indent->new;
+my $tags = Tags::Output::Indent->new(
+        'preserved' => ['style'],
+        'xml' => 1,
+);
+
+my $begin = Tags::HTML::Page::Begin->new(
+        'author' => decode_utf8('Michal Josef Špaček'),
+        'css' => $css,
+        'generator' => 'Tags::HTML::Page::Begin',
+        'lang' => {
+                'title' => 'Hello world!',
+        },
+        'tags' => $tags,
+);
+my $end = Tags::HTML::Page::End->new(
         'tags' => $tags,
 );
 
-# Process page.
+my $obj = Tags::HTML::HelloWorld->new(
+        'css' => $css,
+        'tags' => $tags,
+);
+
+# Process CSS.
+$obj->process_css;
+
+# Process HTML.
+$begin->process;
 $obj->process;
+$end->process;
 
 # Print out.
-print $tags->flush;
+print encode_utf8($tags->flush);
 
 # Output:
 # <!DOCTYPE html>
 # <html lang="en">
 #   <head>
-#     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-#     </meta>
-#     <meta name="author" content="Michal Josef Špaček">
-#     </meta>
-#     <meta name="generator" content=
-#       "Perl module: Tags::HTML::Page::Begin, Version: 0.11">
-#     </meta>
+#     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+#     <meta name="author" content="Michal Josef Špaček" />
+#     <meta name="generator" content="Tags::HTML::Page::Begin" />
+#     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 #     <title>
 #       Hello world!
 #     </title>
+#     <style type="text/css">
+# .hello-world {
+#         margin: auto;
+#         padding: 1em;
+#         backround-color: yellow;
+# }
+# </style>
 #   </head>
 #   <body>
-#     <div>
+#     <div class="hello-world">
 #       Hello world!
 #     </div>
 #   </body>

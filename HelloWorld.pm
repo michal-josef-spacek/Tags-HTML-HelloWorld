@@ -4,48 +4,60 @@ use base qw(Tags::HTML);
 use strict;
 use warnings;
 
-use Tags::HTML::Page::Begin;
-use Tags::HTML::Page::End;
-use Unicode::UTF8 qw(decode_utf8);
-
 our $VERSION = 0.01;
 
 # Constructor.
 sub new {
 	my ($class, @params) = @_;
 
-	# No CSS support.
-	push @params, 'no_css', 1;
-
 	my $self = $class->SUPER::new(@params);
+
+	$self->_cleanup;
 
 	# Object.
 	return $self;
+}
+
+sub _cleanup {
+	my $self = shift;
+
+	$self->{'_text'} = 'Hello world!';
+
+	return;
+}
+
+sub _init {
+	my ($self, $text) = @_;
+
+	$self->{'_text'} = $text;
+
+	return;
 }
 
 # Process 'Tags'.
 sub _process {
 	my $self = shift;
 
-	my $begin = Tags::HTML::Page::Begin->new(
-		'author' => decode_utf8('Michal Josef Špaček'),
-		'lang' => {
-			'title' => 'Hello world!',
-		},
-		'tags' => $self->{'tags'},
-	);
-
-	my $end = Tags::HTML::Page::End->new(
-		'tags' => $self->{'tags'},
-	);
-
-	$begin->process;
 	$self->{'tags'}->put(
 		['b', 'div'],
-		['d', 'Hello world!'],
+		['a', 'class', 'hello-world'],
+		['d', $self->{'_text'}],
 		['e', 'div'],
 	);
-	$end->process;
+
+	return;
+}
+
+sub _process_css {
+	my $self = shift;
+
+	$self->{'css'}->put(
+		['s', '.hello-world'],
+		['d', 'margin', 'auto'],
+		['d', 'padding', '1em'],
+		['d', 'backround-color', 'yellow'],
+		['e'],
+	);
 
 	return;
 }
@@ -55,6 +67,7 @@ sub _process {
 __END__
 
 =pod
+
 
 =encoding utf8
 
@@ -67,7 +80,11 @@ Tags::HTML::HelloWorld - Tags helper for hello world app.
  use Tags::HTML::HelloWorld;
 
  my $obj = Tags::HTML::HelloWorld->new(%params);
+ $obj->cleanup;
+ $obj->prepare;
+ $obj->init($text);
  $obj->process;
+ $obj->process_css;
 
 =head1 METHODS
 
@@ -79,19 +96,66 @@ Constructor.
 
 =over 8
 
+=item * C<css>
+
+'L<CSS::Struct::Output>' object for L<process_css> processing.
+
+Default value is undef.
+
+=item * C<no_css>
+
+No CSS support flag.
+If this flag is set to 1, L<process_css()> returns undef.
+
+Default value is 0.
+
 =item * C<tags>
 
-'Tags::Output' object.
+'L<Tags::Output>' object.
 
 Default value is undef.
 
 =back
 
+=head2 C<cleanup>
+
+ $obj->cleanup;
+
+Cleanup module to init state, which set text to 'Hello World!'.
+
+Returns undef.
+
+=head2 C<init>
+
+ $obj->init($text);
+
+Set text to print.
+
+Returns undef.
+
+=head2 C<prepare>
+
+ $obj->prepare;
+
+Process initialization before page run.
+
+Do nothing in this module.
+
+Returns undef.
+
 =head2 C<process>
 
  $obj->process;
 
-Process Tags structure for output with hello world message.
+Process L<Tags> structure for output with message.
+
+Returns undef.
+
+=head2 C<process_css>
+
+ $obj->process_css;
+
+Process L<CSS::Struct> structure for output.
 
 Returns undef.
 
@@ -112,62 +176,119 @@ Returns undef.
  use strict;
  use warnings;
 
+ use CSS::Struct::Output::Raw;
  use Tags::HTML::HelloWorld;
+ use Tags::HTML::Page::Begin;
+ use Tags::HTML::Page::End;
  use Tags::Output::Raw;
+ use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 
- # Object.
- my $tags = Tags::Output::Raw->new;
+ my $css = CSS::Struct::Output::Raw->new;
+ my $tags = Tags::Output::Raw->new(
+         'xml' => 1,
+ );
+
+ my $begin = Tags::HTML::Page::Begin->new(
+         'author' => decode_utf8('Michal Josef Špaček'),
+         'css' => $css,
+         'generator' => 'Tags::HTML::Page::Begin',
+         'lang' => {
+                 'title' => 'Hello world!',
+         },
+         'tags' => $tags,
+ );
+ my $end = Tags::HTML::Page::End->new(
+         'tags' => $tags,
+ );
  my $obj = Tags::HTML::HelloWorld->new(
+         'css' => $css,
          'tags' => $tags,
  );
 
- # Process page.
+ # Process CSS.
+ $obj->process_css;
+
+ # Process HTML.
+ $begin->process;
  $obj->process;
+ $end->process;
 
  # Print out.
- print $tags->flush;
+ print encode_utf8($tags->flush);
 
  # Output:
  # <!DOCTYPE html>
- # <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></meta><meta name="author" content="Michal Josef Špaček"></meta><meta name="generator" content="Perl module: Tags::HTML::Page::Begin, Version: 0.11"></meta><title>Hello world!</title></head><body><div>Hello world!</div></body></html>
+ # <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="author" content="Michal Josef Špaček" /><meta name="generator" content="Tags::HTML::Page::Begin" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>Hello world!</title><style type="text/css">.hello-world{margin:auto;padding:1em;backround-color:yellow;}
+ # </style></head><body><div class="hello-world">Hello world!</div></body></html>
 
 =head1 EXAMPLE2
 
  use strict;
  use warnings;
 
+ use CSS::Struct::Output::Indent;
  use Tags::HTML::HelloWorld;
+ use Tags::HTML::Page::Begin;
+ use Tags::HTML::Page::End;
  use Tags::Output::Indent;
+ use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 
- # Object.
- my $tags = Tags::Output::Indent->new;
- my $obj = Tags::HTML::HelloWorld->new(
+ my $css = CSS::Struct::Output::Indent->new;
+ my $tags = Tags::Output::Indent->new(
+         'preserved' => ['style'],
+         'xml' => 1,
+ );
+
+ my $begin = Tags::HTML::Page::Begin->new(
+         'author' => decode_utf8('Michal Josef Špaček'),
+         'css' => $css,
+         'generator' => 'Tags::HTML::Page::Begin',
+         'lang' => {
+                 'title' => 'Hello world!',
+         },
+         'tags' => $tags,
+ );
+ my $end = Tags::HTML::Page::End->new(
          'tags' => $tags,
  );
 
- # Process page.
+ my $obj = Tags::HTML::HelloWorld->new(
+         'css' => $css,
+         'tags' => $tags,
+ );
+
+ # Process CSS.
+ $obj->process_css;
+
+ # Process HTML.
+ $begin->process;
  $obj->process;
+ $end->process;
 
  # Print out.
- print $tags->flush;
+ print encode_utf8($tags->flush);
 
  # Output:
  # <!DOCTYPE html>
  # <html lang="en">
  #   <head>
- #     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
- #     </meta>
- #     <meta name="author" content="Michal Josef Špaček">
- #     </meta>
- #     <meta name="generator" content=
- #       "Perl module: Tags::HTML::Page::Begin, Version: 0.11">
- #     </meta>
+ #     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+ #     <meta name="author" content="Michal Josef Špaček" />
+ #     <meta name="generator" content="Tags::HTML::Page::Begin" />
+ #     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
  #     <title>
  #       Hello world!
  #     </title>
+ #     <style type="text/css">
+ # .hello-world {
+ #         margin: auto;
+ #         padding: 1em;
+ #         backround-color: yellow;
+ # }
+ # </style>
  #   </head>
  #   <body>
- #     <div>
+ #     <div class="hello-world">
  #       Hello world!
  #     </div>
  #   </body>
@@ -175,9 +296,7 @@ Returns undef.
 
 =head1 DEPENDENCIES
 
-L<Tags::HTML::Page::Begin>,
-L<Tags::HTML::Page::End>,
-L<Unicode::UTF8>.
+None.
 
 =head1 REPOSITORY
 
