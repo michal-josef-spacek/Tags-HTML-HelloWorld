@@ -172,6 +172,8 @@ Returns undef.
 
 =head1 EXAMPLE1
 
+=for comment filename=example_hello_raw.pl
+
  use strict;
  use warnings;
 
@@ -221,6 +223,8 @@ Returns undef.
  # </style></head><body><div class="hello-world">Hello world!</div></body></html>
 
 =head1 EXAMPLE2
+
+=for comment filename=example_hello_indent.pl
 
  use strict;
  use warnings;
