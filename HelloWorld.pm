@@ -4,6 +4,8 @@ use base qw(Tags::HTML);
 use strict;
 use warnings;
 
+use Error::Pure qw(err);
+
 our $VERSION = 0.01;
 
 # Constructor.
@@ -28,6 +30,12 @@ sub _cleanup {
 
 sub _init {
 	my ($self, $text) = @_;
+
+	if (! defined $text
+		|| ref $text ne '') {
+
+		err 'Bad input text.';
+	}
 
 	$self->{'_text'} = $text;
 
@@ -166,6 +174,7 @@ Returns undef.
          From Tags::HTML::new():
                  Parameter 'css' must be a 'CSS::Struct::Output::*' class.
                  Parameter 'tags' must be a 'Tags::Output::*' class.
+         Bad input text.
 
  process():
          From Tags::HTML::process():
@@ -300,7 +309,7 @@ Returns undef.
 
 =head1 DEPENDENCIES
 
-None.
+L<Error::Pure>.
 
 =head1 REPOSITORY
 

@@ -80,6 +80,7 @@ ERRORS
              From Tags::HTML::new():
                      Parameter 'css' must be a 'CSS::Struct::Output::*' class.
                      Parameter 'tags' must be a 'Tags::Output::*' class.
+             Bad input text.
 
      process():
              From Tags::HTML::process():
@@ -207,7 +208,7 @@ EXAMPLE2
      # </html>
 
 DEPENDENCIES
-    None.
+    Error::Pure.
 
 REPOSITORY
     <https://github.com/michal-josef-spacek/Tags-HTML-HelloWorld>
