@@ -208,7 +208,7 @@ EXAMPLE2
      # </html>
 
 DEPENDENCIES
-    Error::Pure.
+    Error::Pure, Tags::HTML.
 
 REPOSITORY
     <https://github.com/michal-josef-spacek/Tags-HTML-HelloWorld>

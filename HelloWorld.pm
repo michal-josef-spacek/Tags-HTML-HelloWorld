@@ -309,7 +309,8 @@ Returns undef.
 
 =head1 DEPENDENCIES
 
-L<Error::Pure>.
+L<Error::Pure>,
+L<Tags::HTML>.
 
 =head1 REPOSITORY
 
